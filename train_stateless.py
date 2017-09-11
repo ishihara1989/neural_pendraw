@@ -27,13 +27,19 @@ def main():
             loss = model(x)
             # opt.update(model, x)
             # loss = model.loss
-            print(loss)
+            print("loss: ", loss.data)
             loss.backward()
             opt.update()
             canvas = model.canvas
             x[0, 0, :, :] = canvas.data
             x[0, 2, :, :] = model.current_pos.data[0, 0, :, :]
-            images.append(np.clip(canvas.data, 0.0, 1.0))
+            outim = np.zeros((28, 28*3+2), np.float32)
+            outim[:, 28] = 1.0
+            outim[:, 57] = 1.0
+            for c in range(3):
+                outim[:, 28*c+c:28*(c+1)+c] = np.clip(
+                    x[0, c, :, :].data, 0.0, 1.0)
+            images.append(outim)
             # utils.show(canvas.data)
         utils.show(canvas.data)
         utils.save_gif("images/test{0:03d}.gif".format(i), images)
