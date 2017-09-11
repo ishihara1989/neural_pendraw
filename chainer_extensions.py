@@ -1,5 +1,6 @@
 from chainer import cuda
 from chainer.functions.activation.softmax import softmax
+import chainer.functions as F
 
 
 def gumbel_softmax(log_pi, tau=0.1, axis=1):
@@ -32,3 +33,7 @@ def gumbel_softmax(log_pi, tau=0.1, axis=1):
     y = softmax((log_pi + g) / tau, axis=axis)
 
     return y
+
+
+def leaky_clip(x, x_min, x_max, leak=0.2):
+    return leak*x + (1-leak)*F.clip(x, x_min, x_max)

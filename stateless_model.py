@@ -51,13 +51,13 @@ class StatelessModel(chainer.Chain):
         mv_cost = F.sum(
             0.5*self.current_pos*(
                 F.convolution_2d(
-                    x[:,2:3, :,:], self.move_cost, pad=2)+4))
+                    x[:, 2:3, :, :], self.move_cost, pad=2)+4))
         print(mv_cost.data)
         draw = F.convolution_2d(pred, self.pen, pad=1)  # pen stroke
         strength, draw = F.broadcast(self.strength, draw[:, 0, :, :])
         self.draw = strength*draw
         canvas = x[:, 0, :, :] + self.draw
-        self.canvas = canvas[0, :, :]
+        self.canvas = E.leaky_clip(canvas[0, :, :], 0, 1, leak=0.001)
         ref = x[:, 1, :, :]
         diff = F.sum((canvas-ref)**2)
         self.loss = diff+mv_cost
