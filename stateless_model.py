@@ -49,15 +49,14 @@ class StatelessModel(chainer.Chain):
         pred = E.gumbel_softmax(pred, tau=self.tau)
         pred = F.reshape(pred, (b, 1)+shape[2:])
         self.current_pos = pred  # pen position
-        mx, my = np.meshgrid(np.arange(w), np.arange(h))
-        bmx, bmy, pos = F.broadcast(
-            mx.reshape((1, 1, h, w)),
-            my.reshape((1, 1, h, w)),
-            self.current_pos)
-        px, py = pos*mx, pos*my
-        prex, prey = np.sum(mx*x[:, 2, :, :]), np.sum(my*x[:, 2, :, :])
-        dx = F.sqrt((F.sum(px)-prex)**2+(F.sum(py)-prey)**2)
-        print(F.sqrt(dx))
+        # mx, my = np.meshgrid(np.arange(w), np.arange(h))
+        # bmx, bmy, pos = F.broadcast(
+        #     mx.reshape((1, 1, h, w)),
+        #     my.reshape((1, 1, h, w)),
+        #     self.current_pos)
+        # px, py = pos*mx, pos*my
+        # prex, prey = np.sum(mx*x[:, 2, :, :]), np.sum(my*x[:, 2, :, :])
+        # dx = F.sqrt((F.sum(px)-prex)**2+(F.sum(py)-prey)**2)
         mv_cost = F.sum(
             0.5*self.current_pos*(
                 F.convolution_2d(

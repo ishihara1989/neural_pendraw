@@ -1,4 +1,5 @@
 import os
+import sys
 
 import numpy as np
 import chainer
@@ -15,21 +16,19 @@ def main():
     opt.setup(model)
 
     for i, img in enumerate(dataset[:100]):
-        utils.show(img)
         x = np.zeros((1, 3, 28, 28), np.float32)
         x[0, 1, :, :] = img.reshape((28, 28))  # ref
         x[0, 2, 0, 0] = 1.0  # initial pen position
         images = []
 
-        for _ in range(30):
-            # print(x)
+        for t in range(30):
             model.cleargrads()
             loss = model(x)
-            # opt.update(model, x)
-            # loss = model.loss
-            print("loss: ", loss.data)
             loss.backward()
             opt.update()
+            if t%30==29:
+                print("loss: ", loss.data)
+                sys.stdout.flush()
             canvas = model.canvas
             x[0, 0, :, :] = canvas.data
             x[0, 2, :, :] = model.current_pos.data[0, 0, :, :]
@@ -37,11 +36,8 @@ def main():
             outim[:, 28] = 1.0
             outim[:, 57] = 1.0
             for c in range(3):
-                outim[:, 28*c+c:28*(c+1)+c] = np.clip(
-                    x[0, c, :, :].data, 0.0, 1.0)
-            images.append(outim)
-            # utils.show(canvas.data)
-        utils.show(canvas.data)
+                outim[:, 28*c+c:28*(c+1)+c] = x[0, c, :, :].data
+            images.append(np.clip(outim, 0.0, 1.0))
         utils.save_gif("images/test{0:03d}.gif".format(i), images)
         if model.tau > 0.1:
             model.tau *= 0.99
