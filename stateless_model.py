@@ -11,8 +11,9 @@ class StatelessModel(chainer.Chain):
 
     def __init__(self):
         super().__init__(
-            l1=L.Convolution2D(None, 4, 3, pad=1),
-            l2=L.Convolution2D(None, 4, 3, pad=1),
+            l1=L.Convolution2D(None, 8, 5, pad=2),
+            l2=L.Convolution2D(None, 8, 5, pad=2),
+            l3=L.Convolution2D(None, 8, 5, pad=2),
             lout=L.Convolution2D(None, 1, 3, pad=1),
             l_str=L.Linear(None, 1),
         )
@@ -33,6 +34,8 @@ class StatelessModel(chainer.Chain):
         h = self.l1(h)
         h = F.tanh(h)
         h = self.l2(h)
+        h = F.tanh(h)
+        h = self.l3(h)
         h = F.tanh(h)
         self.strength = F.sigmoid(self.l_str(h))
         self.strength = F.reshape(self.strength, (-1, 1, 1))
